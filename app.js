@@ -21,7 +21,6 @@ app.get('/', function(req, res) {
   //If statement ensures read and storing only happens once
   if(TimesRan < 1)
   {
-   
     fs.readFile                                             
     ('DataSet.json', 'utf8',function (err, data){             //Reads in the JSON dataset file.
 
@@ -29,8 +28,7 @@ app.get('/', function(req, res) {
       
       for(var i=0; i<Data.length; i++)                        //for loop that stores only the titles.
       {
-          Titles[i] = (Data[i].entity);                       
-          Titles[i] = Titles[i].replace(/\s/g,'');            //Getting rid of all spaces in the titles.
+          Titles[i] = (Data[i].entity);                        
       }
     })
     TimesRan += 1;
@@ -49,7 +47,6 @@ app.get('/search', function(req, res){
 
   var input = req.query.searchBox;            //Grabs the users input from the html page.
   input = input.toLowerCase();                //Makes the input string into lowercase.
-  input = input.replace(/\s/g,'');            //Gets rid of all spaces in the string.
   
   if(Titles.includes(input) == true)          //checks if input is in the dataset
     res.redirect('/results');                 //If yes goes to result page
