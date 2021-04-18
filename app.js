@@ -58,7 +58,7 @@ app.get('/search', function(req, res){
   
   if(Titles.includes(input) == true)          //checks if input is in the dataset
   {
-    res.redirect('/results');                 //If yes goes to result page
+    res.redirect('/home/results');                 //If yes goes to result page
   }
   else
     res.redirect('/error');                   //If no presents an error
@@ -69,7 +69,7 @@ app.get('/search', function(req, res){
 //Future results page, will talk to IMDb and grab info from there
 //it will then send info to html then call the html file and 
 //send that to website to display to user.
-app.get('/results', function(req, res){
+app.get('/home/results', function(req, res){
   res.sendFile(__dirname +'/Results.html');
 });
 
@@ -78,7 +78,7 @@ app.get('/results', function(req, res){
 //Error message page most likely will get rid of and
 //display error message on homepage.Just used for testing.
 app.get('/error', function(req,res){
-  res.send(input + ' was not found.');
+  res.sendFile(__dirname +'/ErrorPage.html');
 });
 
 
