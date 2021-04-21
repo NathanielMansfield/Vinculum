@@ -12,12 +12,10 @@ app.set('view engine', 'pug');
   var input;
 //Variables that store info from the DataSet file.
   var Titles = [];   
-  var Winner = [];
 //Variables that help get info for Results page.
-  var InputIndex = 0;
   var title;
   var rating;
-  var review;
+  var actors = [];
   var winner;
   var links;
 //Variable that ensures the read only happens once.                         
@@ -37,8 +35,7 @@ app.get('/', function(req, res) {
       
       for(var i=0; i<Data.length; i++)                        //for loop that stores only the titles.
       {
-          Titles[i] = (Data[i].entity); 
-          Winner[i] = (Data[i].winner);                 
+          Titles[i] = (Data[i].entity);                
       }
     })
     TimesRan += 1;
@@ -76,25 +73,24 @@ app.get('/search', function(req, res){
 //it will then send info to html then call the html file and 
 //send that to website to display to user.
 app.get('/home/results', function(req, res){
-  InputIndex = Titles.indexOf(input);
-  winner = Winner[InputIndex];
 
-  if(winner = false)
-    winner = 'No';
-  else
-    winner = 'Yes';
-    
-  res.render('Results',{movie: input, 
-                        rating: 'data', 
-                        actors: 'data',
-                        OscarWinner: winner, 
-                        links: 'data'});
+  //Dummy info for now.
+  title = input;
+  rating = 'data';
+  actors = 'data';
+  winner = 'data';
+  links = 'links';
+
+  //Sending the info to results page.
+  res.render('Results',
+  {movie: input, rating: rating, 
+    actors: actors, OscarWinner: winner, 
+    links: links});
 });
 
 
 
-//Error message page most likely will get rid of and
-//display error message on homepage.Just used for testing.
+//Error message page 
 app.get('/error', function(req,res){
   res.sendFile(__dirname +'/views/ErrorPage.html');
 });
