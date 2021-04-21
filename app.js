@@ -3,13 +3,13 @@ var express = require('express');
 var path = require('path');
 var app = express();
 const fs = require('fs');
+const { render } = require('express/lib/response');
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json()); 
-var input;
+app.set('view engine', 'pug');
 
-
-
-
+//Variable that stores users input.
+  var input;
 //Titles array that stores all and only the titles.
   var Titles = [];      
 //Variable that ensures the read only happens once.                         
@@ -22,7 +22,6 @@ app.get('/', function(req, res) {
   //If statement ensures read and storing only happens once
   if(TimesRan < 1)
   {
-   
     fs.readFile                                             
     ('DataSet.json', 'utf8',function (err, data){             //Reads in the JSON dataset file.
 
@@ -38,14 +37,12 @@ app.get('/', function(req, res) {
 
   //Sending the html file that dsiplays homepage.
   res.redirect('/home');
-  
-  
 });
 
 //Sends homepage after JSON file is completely read.
 app.get('/home', function(req,res){
   setTimeout(() => 
-  {res.sendFile(__dirname +'/HomePage.html');}, 200);
+  {res.sendFile(__dirname +'/views/HomePage.html');}, 200);
 })
 
 //Once the user presses submit button or enterkey 
@@ -53,12 +50,12 @@ app.get('/home', function(req,res){
 //oscar nomination dataset then put out results or error message.
 app.get('/search', function(req, res){
 
-  input = req.query.searchBox;            //Grabs the users input from the html page.
+  input = req.query.searchBox;                //Grabs the users input from the html page.
   input = input.toLowerCase();                //Makes the input string into lowercase.
   
   if(Titles.includes(input) == true)          //checks if input is in the dataset
   {
-    res.redirect('/home/results');                 //If yes goes to result page
+    res.redirect('/home/results');            //If yes goes to result page
   }
   else
     res.redirect('/error');                   //If no presents an error
@@ -70,7 +67,11 @@ app.get('/search', function(req, res){
 //it will then send info to html then call the html file and 
 //send that to website to display to user.
 app.get('/home/results', function(req, res){
-  res.sendFile(__dirname +'/Results.html');
+  res.render('Results',{movie: input, 
+                        rating: 'data', 
+                        actors: 'data',
+                        OscarWinner: 'data', 
+                        links: 'data'});
 });
 
 
@@ -78,7 +79,7 @@ app.get('/home/results', function(req, res){
 //Error message page most likely will get rid of and
 //display error message on homepage.Just used for testing.
 app.get('/error', function(req,res){
-  res.sendFile(__dirname +'/ErrorPage.html');
+  res.sendFile(__dirname +'/views/ErrorPage.html');
 });
 
 
