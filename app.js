@@ -10,8 +10,16 @@ app.set('view engine', 'pug');
 
 //Variable that stores users input.
   var input;
-//Titles array that stores all and only the titles.
-  var Titles = [];      
+//Variables that store info from the DataSet file.
+  var Titles = [];   
+  var Winner = [];
+//Variables that help get info for Results page.
+  var InputIndex = 0;
+  var title;
+  var rating;
+  var review;
+  var winner;
+  var links;
 //Variable that ensures the read only happens once.                         
   let TimesRan = 0;                            
 
@@ -29,7 +37,8 @@ app.get('/', function(req, res) {
       
       for(var i=0; i<Data.length; i++)                        //for loop that stores only the titles.
       {
-          Titles[i] = (Data[i].entity);                       
+          Titles[i] = (Data[i].entity); 
+          Winner[i] = (Data[i].winner);                 
       }
     })
     TimesRan += 1;
@@ -50,27 +59,35 @@ app.get('/home', function(req,res){
 //oscar nomination dataset then put out results or error message.
 app.get('/search', function(req, res){
 
-  input = req.query.searchBox;                //Grabs the users input from the html page.
-  input = input.toLowerCase();                //Makes the input string into lowercase.
+  input = req.query.searchBox;                  //Grabs the users input from the html page.
+  input = input.toLowerCase();                  //Makes the input string into lowercase.
   
-  if(Titles.includes(input) == true)          //checks if input is in the dataset
+  if(Titles.includes(input) == true)            //checks if input is in the dataset
   {
-    res.redirect('/home/results');            //If yes goes to result page
+    res.redirect('/home/results');              //If yes goes to result page
   }
   else
-    res.redirect('/error');                   //If no presents an error
+    res.redirect('/error');                     //If no presents an error
 });
 
 
 
-//Future results page, will talk to IMDb and grab info from there
+//Future results page, will talk to OMDb and grab info from there
 //it will then send info to html then call the html file and 
 //send that to website to display to user.
 app.get('/home/results', function(req, res){
+  InputIndex = Titles.indexOf(input);
+  winner = Winner[InputIndex];
+
+  if(winner = false)
+    winner = 'No';
+  else
+    winner = 'Yes';
+    
   res.render('Results',{movie: input, 
                         rating: 'data', 
                         actors: 'data',
-                        OscarWinner: 'data', 
+                        OscarWinner: winner, 
                         links: 'data'});
 });
 
