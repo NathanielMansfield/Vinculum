@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var app = express();
 const fs = require('fs');
-const { render } = require('express/lib/response');
+const axios = require('axios').default;
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json()); 
 app.set('view engine', 'pug');
@@ -74,18 +74,22 @@ app.get('/search', function(req, res){
 //send that to website to display to user.
 app.get('/home/results', function(req, res){
 
-  //Dummy info for now.
-  title = input;
-  rating = 'data';
-  actors = 'data';
-  winner = 'data';
-  links = 'links';
-
+  var omdb;
+  axios.get('https://www.omdbapi.com/?t=$' + input +'&apikey=15c1d264')
+  .then((response)=>{ 
+    omdb = (response.data);
+  //Info for results page.
+    title = omdb.Title;
+    rating = omdb.Metascore;
+    actors = omdb.Actors;
+    winner = omdb.Awards;
+    links = omdb.Plot;
   //Sending the info to results page.
-  res.render('Results',
-  {movie: input, rating: rating, 
-    actors: actors, OscarWinner: winner, 
-    links: links});
+    res.render('Results',
+      {movie: title, rating: rating, 
+      actors: actors, OscarWinner: winner, 
+      links: links});
+  });
 });
 
 
