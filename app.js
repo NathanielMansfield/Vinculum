@@ -13,6 +13,7 @@ app.set('view engine', 'pug');
 //Variables that store info from the DataSet file.
   var Titles = [];   
 //Variables that help get info for Results page.
+  var omdb;
   var title;
   var rating;
   var actors = [];
@@ -21,6 +22,8 @@ app.set('view engine', 'pug');
 //Variable that ensures the read only happens once.                         
   let TimesRan = 0;                            
 
+
+
 //Calls the html GUI on start up.
 //Reads in dataset file and stores the titles.
 app.get('/', function(req, res) {
@@ -28,12 +31,15 @@ app.get('/', function(req, res) {
   //If statement ensures read and storing only happens once
   if(TimesRan < 1)
   {
+    //Reads in the JSON dataset file.
     fs.readFile                                             
-    ('DataSet.json', 'utf8',function (err, data){             //Reads in the JSON dataset file.
+    ('DataSet.json', 'utf8',function (err, data){           
 
-      var Data = JSON.parse(data.toLowerCase());              //makes all data lowercase.
+      //makes all data lowercase.
+      var Data = JSON.parse(data.toLowerCase());             
       
-      for(var i=0; i<Data.length; i++)                        //for loop that stores only the titles.
+      //for loop that stores only the titles.
+      for(var i=0; i<Data.length; i++)                        
       {
           Titles[i] = (Data[i].entity);                
       }
@@ -45,45 +51,57 @@ app.get('/', function(req, res) {
   res.redirect('/home');
 });
 
+
+
+
 //Sends homepage after JSON file is completely read.
 app.get('/home', function(req,res){
   setTimeout(() => 
   {res.sendFile(__dirname +'/views/HomePage.html');}, 200);
 })
 
-//Once the user presses submit button or enterkey 
-//this will read the entry and check if entry is in
-//oscar nomination dataset then put out results or error message.
+
+
+
+//Reads the entry and check if entry is in
+//oscar nomination dataset then routes to results or error message.
 app.get('/search', function(req, res){
 
-  input = req.query.searchBox;                  //Grabs the users input from the html page.
-  input = input.toLowerCase();                  //Makes the input string into lowercase.
+  //Grabs the users input from the html page.
+  input = req.query.searchBox; 
+
+  //Makes the input string into lowercase.              
+  input = input.toLowerCase();                 
   
-  if(Titles.includes(input) == true)            //checks if input is in the dataset
+  //checks if input is in the dataset
+  if(Titles.includes(input) == true)            
   {
-    res.redirect('/home/results');              //If yes goes to result page
+    //If yes goes to result page
+    res.redirect('/home/results');             
   }
   else
-    res.redirect('/error');                     //If no presents an error
+    //If no presents an error
+    res.redirect('/error');                     
 });
 
 
 
-//Future results page, will talk to OMDb and grab info from there
-//it will then send info to html then call the html file and 
-//send that to website to display to user.
+//Results page, talks to OMDb and grabs info
+//sends info to front end and displays it.
 app.get('/home/results', function(req, res){
 
-  var omdb;
+  //Getting the info from Omdb api.
   axios.get('https://www.omdbapi.com/?t=$' + input +'&apikey=15c1d264')
   .then((response)=>{ 
     omdb = (response.data);
+
   //Info for results page.
     title = omdb.Title;
     rating = omdb.Metascore;
     actors = omdb.Actors;
     winner = omdb.Awards;
-    links = omdb.Plot;
+    links = omdb.Year;
+
   //Sending the info to results page.
     res.render('Results',
       {movie: title, rating: rating, 
