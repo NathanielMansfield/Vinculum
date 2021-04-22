@@ -17,8 +17,8 @@ app.set('view engine', 'pug');
   var title;
   var rating;
   var actors = [];
-  var winner;
-  var links;
+  var awards;
+  var random;
 //Variable that ensures the read only happens once.                         
   let TimesRan = 0;                            
 
@@ -77,7 +77,7 @@ app.get('/search', function(req, res){
   if(Titles.includes(input) == true)            
   {
     //If yes goes to result page
-    res.redirect('/home/results');             
+    res.redirect('/results');             
   }
   else
     //If no presents an error
@@ -88,7 +88,7 @@ app.get('/search', function(req, res){
 
 //Results page, talks to OMDb and grabs info
 //sends info to front end and displays it.
-app.get('/home/results', function(req, res){
+app.get('/results', function(req, res){
 
   //Getting the info from Omdb api.
   axios.get('https://www.omdbapi.com/?t=$' + input +'&apikey=15c1d264')
@@ -99,14 +99,14 @@ app.get('/home/results', function(req, res){
     title = omdb.Title;
     rating = omdb.Metascore;
     actors = omdb.Actors;
-    winner = omdb.Awards;
-    links = omdb.Year;
+    awards = omdb.Awards;
+    random = omdb.Year;
 
   //Sending the info to results page.
     res.render('Results',
       {movie: title, rating: rating, 
-      actors: actors, OscarWinner: winner, 
-      links: links});
+      actors: actors, awards: awardss, 
+      random: random});
   });
 });
 
