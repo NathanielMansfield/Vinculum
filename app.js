@@ -105,7 +105,7 @@ app.get('/results', function(req, res){
   //Sending the info to results page.
     res.render('Results',
       {movie: title, rating: rating, 
-      actors: actors, awards: awardss, 
+      actors: actors, awards: awards, 
       random: random});
   });
 });
