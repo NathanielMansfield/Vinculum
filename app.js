@@ -4,6 +4,7 @@ var path = require('path');
 var app = express();
 const fs = require('fs');
 const axios = require('axios').default;
+const { type } = require('os');
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json()); 
 app.set('view engine', 'pug');
@@ -35,6 +36,7 @@ app.set('view engine', 'pug');
   var temp = 0;
   var ResData = [];
   let i = 0;
+  var acting;
 
 
 //Calls the html GUI on start up.
@@ -146,6 +148,7 @@ app.get('/response', function(req, res)
     typeSearch = input;
   }
 
+
   axios.get(OmdbURL + typeSearch + Key)
   .then((response)=>{ 
     omdb = (response.data);
@@ -180,24 +183,54 @@ app.get('/api/:typeSearch/:year', function(req,res)
 {
   ResData = [];
   i = 0;
+
   typeSearch = req.params.typeSearch;
   typeSearch = typeSearch.toLowerCase();
 
   year = req.params.year;
   year = Number(year);
 
-  temp = Category[index];
-  index = Year.indexOf(year);
-
-  while(temp != 'directing')
-    { 
-      temp = Category[index];
-      index = index + 1;
-    }
  
-  while(temp == 'directing')
+  index = Year.indexOf(year);
+  temp = Category[index];
+
+  while(temp != typeSearch)
+    { 
+      if( temp == "actor in a supporting role" || temp == "actor in a leading role")
+      {
+        temp = 'actors';
+        acting = temp;
+      }
+      else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
+      {
+        temp = 'actresses';
+        acting = temp;
+      }
+      else
+      {     
+        temp = Category[index];
+        index = index + 1;
+      }
+    }
+  
+
+  while(temp == typeSearch)
     {
       temp = Category[index];
+
+      if(temp == "actor in a supporting role" || temp == "actor in a leading role")
+      {
+        temp = 'actors';
+      }
+      else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
+      {
+        temp = 'actresses';
+      }
+      else
+      {
+        temp = Category[index];
+      }
+      
       ResData[i] = (Titles[index-1]);
       index+=1;
       i+=1;
@@ -205,10 +238,6 @@ app.get('/api/:typeSearch/:year', function(req,res)
 
     res.send(ResData);
 })
-
-
-
-
-
+ 
 
 module.exports = app;
