@@ -194,49 +194,55 @@ app.get('/api/:typeSearch/:year', function(req,res)
   index = Year.indexOf(year);
   temp = Category[index];
 
-  while(temp != typeSearch)
-    { 
-      if( temp == "actor in a supporting role" || temp == "actor in a leading role")
-      {
-        temp = 'actors';
-        acting = temp;
+  if(Category.includes(typeSearch))
+  {
+
+    while(temp != typeSearch)
+      { 
+        if( temp == "actor in a supporting role" || temp == "actor in a leading role")
+        {
+          temp = 'actors';
+         
+        }
+        else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
+        {
+          temp = 'actresses';
+        }
+        else
+        {     
+          temp = Category[index];
+          index = index + 1;
+        }
       }
-      else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
-      {
-        temp = 'actresses';
-        acting = temp;
-      }
-      else
-      {     
-        temp = Category[index];
-        index = index + 1;
-      }
-    }
   
 
-  while(temp == typeSearch)
-    {
-      temp = Category[index];
-
-      if(temp == "actor in a supporting role" || temp == "actor in a leading role")
-      {
-        temp = 'actors';
-      }
-      else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
-      {
-        temp = 'actresses';
-      }
-      else
+    while(temp == typeSearch)
       {
         temp = Category[index];
-      }
-      
-      ResData[i] = (Titles[index-1]);
-      index+=1;
-      i+=1;
-    }
 
+        if(temp == "actor in a supporting role" || temp == "actor in a leading role")
+        {
+          temp = 'actors';
+        }
+        else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
+        {
+          temp = 'actresses';
+        }
+        else
+        {
+          temp = Category[index];
+        }
+      
+        ResData[i] = (Titles[index-1]);
+        index+=1;
+        i+=1;
+      }
     res.send(ResData);
+  }
+  else
+  {
+    res.redirect('/error')
+  }
 })
  
 
