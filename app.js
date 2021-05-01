@@ -8,10 +8,17 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json()); 
 app.set('view engine', 'pug');
 
+//Query URL
+  var OmdbURL = 'https://www.omdbapi.com/?t=$';
+  var Key ='&apikey=15c1d264';
 //Variable that stores users input.
-  var input;
+  var input = 'empty';
 //Variables that store info from the DataSet file.
-  var Titles = [];   
+  var Data;
+  var Titles = [];
+  var Category = [];
+  var Year =[];
+  var Winner =[];
 //Variables that help get info for Results page.
   var omdb;
   var title;
@@ -21,7 +28,13 @@ app.set('view engine', 'pug');
   var random;
 //Variable that ensures the read only happens once.                         
   let TimesRan = 0;                            
-
+//Variables for API
+  var typeSearch;
+  var json;
+  var index = 0;
+  var temp = 0;
+  var ResData = [];
+  let i = 0;
 
 
 //Calls the html GUI on start up.
@@ -36,12 +49,15 @@ app.get('/', function(req, res) {
     ('DataSet.json', 'utf8',function (err, data){           
 
       //makes all data lowercase.
-      var Data = JSON.parse(data.toLowerCase());             
+      Data = JSON.parse(data.toLowerCase());             
       
       //for loop that stores only the titles.
       for(var i=0; i<Data.length; i++)                        
       {
-          Titles[i] = (Data[i].entity);                
+          Titles[i] = (Data[i].entity); 
+          Category[i] = (Data[i].category);
+          Year[i]= Number(Data[i].year);
+          Winner[i] =(Data[i].winner);            
       }
     })
     TimesRan += 1;
@@ -91,9 +107,12 @@ app.get('/search', function(req, res){
 app.get('/results', function(req, res){
 
   //Getting the info from Omdb api.
-  axios.get('https://www.omdbapi.com/?t=$' + input +'&apikey=15c1d264')
+  axios.get(OmdbURL + input + Key)
   .then((response)=>{ 
     omdb = (response.data);
+
+    json = JSON.stringify(omdb);
+    fs.writeFileSync('Response.json', json)
 
   //Info for results page.
     title = omdb.Title;
@@ -116,6 +135,80 @@ app.get('/results', function(req, res){
 app.get('/error', function(req,res){
   res.sendFile(__dirname +'/views/ErrorPage.html');
 });
+
+
+
+
+app.get('/response', function(req, res)
+{
+  if(typeSearch != input && (input != 'empty'))
+  {
+    typeSearch = input;
+  }
+
+  axios.get(OmdbURL + typeSearch + Key)
+  .then((response)=>{ 
+    omdb = (response.data);
+    json = JSON.stringify(omdb);
+    
+    input = 'empty';
+    fs.writeFileSync('Response.json', json)
+    res.sendFile(__dirname + '/Response.json');
+  })
+})
+
+
+
+
+app.get('/api/:typeSearch', function(req,res)
+{
+  typeSearch = req.params.typeSearch;
+  typeSearch = typeSearch.toLowerCase();
+
+
+  if(Titles.includes(typeSearch))
+  {
+    res.redirect('/response');
+  }
+  else
+  {
+    res.redirect('/error');
+  }
+})
+
+app.get('/api/:typeSearch/:year', function(req,res)
+{
+  ResData = [];
+  i = 0;
+  typeSearch = req.params.typeSearch;
+  typeSearch = typeSearch.toLowerCase();
+
+  year = req.params.year;
+  year = Number(year);
+
+  temp = Category[index];
+  index = Year.indexOf(year);
+
+  while(temp != 'directing')
+    { 
+      temp = Category[index];
+      index = index + 1;
+    }
+ 
+  while(temp == 'directing')
+    {
+      temp = Category[index];
+      ResData[i] = (Titles[index-1]);
+      index+=1;
+      i+=1;
+    }
+
+    res.send(ResData);
+})
+
+
+
+
 
 
 module.exports = app;
