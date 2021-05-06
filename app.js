@@ -170,6 +170,12 @@ app.get('/response', function(req, res)
 //                  //
 //                  //
 
+
+app.get('/api', function(req,res)
+{
+  res.sendFile(__dirname +'/views/Directions.html')
+})
+
 //Searching a movie through the URL.
 app.get('/api/:typeSearch', function(req,res)
 {
