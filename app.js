@@ -170,7 +170,7 @@ app.get('/response', function(req, res)
 //                  //
 //                  //
 
-
+//Sends the instructions on how to use API
 app.get('/api', function(req,res)
 {
   res.sendFile(__dirname +'/views/Directions.html')
