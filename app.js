@@ -4,7 +4,6 @@ var path = require('path');
 var app = express();
 const fs = require('fs');
 const axios = require('axios').default;
-const { type } = require('os');
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json()); 
 app.set('view engine', 'pug');
@@ -31,13 +30,20 @@ app.set('view engine', 'pug');
   let TimesRan = 0;                            
 //Variables for API
   var typeSearch;
+  var year;
+  var IsWinner;
   var json;
   var index = 0;
-  var temp = 0;
+  var temp;
   var ResData = [];
+  var IsOscar =[];
   let i = 0;
-  var acting;
 
+//                //
+//                //
+//      GUI       //
+//                //
+//                //
 
 //Calls the html GUI on start up.
 //Reads in dataset file and stores the titles.
@@ -59,7 +65,7 @@ app.get('/', function(req, res) {
           Titles[i] = (Data[i].entity); 
           Category[i] = (Data[i].category);
           Year[i]= Number(Data[i].year);
-          Winner[i] =(Data[i].winner);            
+          Winner[i] = String(Data[i].winner);            
       }
     })
     TimesRan += 1;
@@ -113,7 +119,7 @@ app.get('/results', function(req, res){
   .then((response)=>{ 
     omdb = (response.data);
 
-    json = JSON.stringify(omdb);
+    json = JSON.stringify(omdb, null, 2);
     fs.writeFileSync('Response.json', json)
 
   //Info for results page.
@@ -140,110 +146,234 @@ app.get('/error', function(req,res){
 
 
 
-
+//Response page sends the Respone.json through GUI
 app.get('/response', function(req, res)
 {
+  //if user searches through URL, connects it with the GUI response.
   if(typeSearch != input && (input != 'empty'))
   {
     typeSearch = input;
   }
+  
+  //Querying the entry. Function at Line 295.
+  query(typeSearch);
 
-
-  axios.get(OmdbURL + typeSearch + Key)
-  .then((response)=>{ 
-    omdb = (response.data);
-    json = JSON.stringify(omdb);
-    
-    input = 'empty';
-    fs.writeFileSync('Response.json', json)
-    res.sendFile(__dirname + '/Response.json');
-  })
+  //Waits for Query to finish then displays response.
+  setTimeout(() => 
+  { res.sendFile(__dirname + '/Response.json');}, 1000);
+ 
 })
 
+//                  //
+//                  //
+//        API       //
+//                  //
+//                  //
 
-
-
+//Searching a movie through the URL.
 app.get('/api/:typeSearch', function(req,res)
 {
+  //Grabs the Movie name from url and makes it lowercase
   typeSearch = req.params.typeSearch;
   typeSearch = typeSearch.toLowerCase();
 
-
+  //Checks if movie is in dataset file
   if(Titles.includes(typeSearch))
   {
-    res.redirect('/response');
+    //doing query on movie. Function at Line 295.
+    query(typeSearch);
+    
+    //Waits for Query to finish to display response.
+    setTimeout(() => 
+    { res.sendFile(__dirname + '/Response.json');}, 1000);
   }
+
+  //Goes to error page if movie isn't found. 
   else
   {
     res.redirect('/error');
   }
 })
 
+
+
+//Searches a category and year to give a list of movies.
 app.get('/api/:typeSearch/:year', function(req,res)
 {
+  //reseting variables
   ResData = [];
   i = 0;
 
+  //Grabs the catgeory from url and makes it lowercase
   typeSearch = req.params.typeSearch;
   typeSearch = typeSearch.toLowerCase();
 
+  //Grabs the year and makes it into number
   year = req.params.year;
   year = Number(year);
 
- 
-  index = Year.indexOf(year);
-  temp = Category[index];
-
-  if(Category.includes(typeSearch))
+  //checks if entries are valid
+  if(year < 2018 && year > 1926 && Category.includes(typeSearch))
   {
+    //getting the index of where this year occurs first.
+    index = Year.indexOf(year);
 
-    while(temp != typeSearch)
-      { 
-        if( temp == "actor in a supporting role" || temp == "actor in a leading role")
-        {
-          temp = 'actors';
-         
-        }
-        else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
-        {
-          temp = 'actresses';
-        }
-        else
-        {     
-          temp = Category[index];
-          index = index + 1;
-        }
-      }
-  
+    //Setting temp to whatever category is in the user entered year
+    temp = Category[index];
 
-    while(temp == typeSearch)
-      {
-        temp = Category[index];
+    //Search function that returns the movies from the given year and category. Function on Line 316
+    GetCatList(temp, typeSearch);
 
-        if(temp == "actor in a supporting role" || temp == "actor in a leading role")
-        {
-          temp = 'actors';
-        }
-        else if(temp == "actress in a supporting role" || temp =="actress in a leading role")
-        {
-          temp = 'actresses';
-        }
-        else
-        {
-          temp = Category[index];
-        }
-      
-        ResData[i] = (Titles[index-1]);
-        index+=1;
-        i+=1;
-      }
+    //displaying the movie list.
     res.send(ResData);
   }
+
+  //Goes to error page if movie isn't found.
   else
   {
     res.redirect('/error')
   }
 })
- 
+
+
+
+//Searches a category and year to return the oscar winning movie
+app.get('/api/:typeSearch/:year/:true', function(req,res)
+{
+  //Reseting variables
+  ResData = [];
+  i = 0;
+
+  //Grabs the Category from url and makes it lowercase.
+  typeSearch = req.params.typeSearch;
+  typeSearch = typeSearch.toLowerCase();
+
+  //Grabs the year from the url and makes it a number.
+  year = req.params.year;
+  year = Number(year);
+  
+  //Grabs the true from the url and makes it lowercase.
+  IsWinner = req.params.true;
+  IsWInner = IsWinner.toLowerCase();
+
+  //checks if the entries are valid
+  if(year < 2018 && year > 1926 && Category.includes(typeSearch))
+  {
+    //getting the index of where this year occurs first.
+    index = Year.indexOf(year);
+
+    //Setting temp to whatever category is in the user entered year
+    temp = Category[index];
+
+    //Search function that returns the movies from the given year and category. Function on Line 316
+    GetCatList(temp, typeSearch);
+
+    //Resetting variable.
+    i = 0;
+
+    //Setting temp equal to true or false depending on IsOscar.
+    temp = IsOscar[i];
+
+    //Setting input equal to what movie that the function returns. Funcion on Line 337
+    input = GetWinner(temp);
+    
+    //Querying the input. Function at Line 295.
+    query(input);
+
+    //displaying the response after query is done.
+    setTimeout(() => 
+    { res.sendFile(__dirname + '/Response.json');}, 1000);
+  }
+
+  //if check fails sends to error page.
+  else
+  {
+    res.redirect('/error')
+  }
+
+})
+
+
+//                            //
+//                            //
+//        Functions           //
+//                            //
+//                            //
+
+
+//Query function, populates response.json
+function query(info)
+{
+  //querys omdb api with the given info
+  axios.get(OmdbURL + info + Key)
+  .then((response)=>{ 
+    omdb = (response.data);
+
+    //Makes the data look nice
+    json = JSON.stringify(omdb, null, 2);
+    
+    //resetting varibles.
+    input = 'empty';
+
+    //writing the Response.json file.
+    fs.writeFileSync('Response.json', json)
+  })
+
+}
+
+//Get the list of movies in a category for a given year.
+function GetCatList(temp, typeSearch)
+{
+  
+  //Iterate through until temp equals the category given.
+  while(temp != typeSearch)
+    { 
+      temp = Category[index];
+      index = index + 1;
+    }
+
+  //Iterate through and grab titles until Category doesn't equal given category.
+  while(temp == typeSearch)
+    {     
+      temp = Category[index];     
+      ResData[i] = (Titles[index-1]);
+      IsOscar[i] = (Winner[index-1]);
+      index+=1;
+      i+=1;
+    }
+}
+
+//Gets the winner form the given category and year.
+function GetWinner(temp)
+{
+  //resetting varibale
+  i = -1;
+
+  //checks if the first index in array is a winner or not
+  if(temp == "false")
+  {
+    //iterates through movies until it gets to winner.
+    while(temp != "true" && i<IsOscar.length)
+    {
+      i+=1;
+      temp = IsOscar[i];
+    }
+  }
+
+  //if first index is winner sets the i variable accordingly.
+  else if(temp == "true")
+  {
+    i+=1;
+  }
+
+  //sets input to the winning movie title
+  input = ResData[i];
+
+  //returns the winner.
+  return input;
+}
+
+
+
 
 module.exports = app;
