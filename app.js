@@ -231,7 +231,10 @@ app.get('/api/:typeSearch/:year', function(req,res)
     GetCatList(temp, typeSearch);
 
     //displaying the movie list.
-    res.send(ResData);
+    json = JSON.stringify(ResData, null, 2);
+    fs.writeFileSync('Response.json', json)
+    setTimeout(() => 
+    { res.sendFile(__dirname + '/Response.json');}, 1000);
   }
 
   //Goes to error page if movie isn't found.
