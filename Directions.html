@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<head>
+<title>Vinculum - API Instructions</title>
+<style>
+div {
+  background-color: lightgray;
+  width: 1725px;
+  height: 615px;
+  border: 15px solid black;
+  margin: 20px;
+  padding: 50px;
+  font-family: Tahoma, Verdana, Arial, sans-serif; 
+  font-size: 12px;
+  
+}
+</style>
+</head>
+<body style="background-image: -webkit-linear-gradient(left, blue, purple);">
+<a href="/home">
+<p style="color: white; font-size: 22px"><b>Home</p>
+</a>
+<p style="position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; font-family: Tahoma, Verdana, Arial, sans-serif; font-size: 28px; color: white;  text-shadow: -1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;"><b>&copy; 2021 by Vinculum. All Rights Reserved</p>
+<h1 style=" text-align: center; color: white; font-size: 28px; text-shadow: -1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;"><center>Vinculum Movie Search API Instructions</center></h1> 
+<div style="font-family: Tahoma, Verdana, Arial, sans-serif; font-size: 16px; text-align: center;">
+  Vinculum User Guide
+  <br>
+  <br>Singletons  > To query for singleton endpoints in the URL
+  <br>
+  <br>http://localhost:3000/api/"movie name"
+  <br>- this will query movies by name (data from 1927 to 2017)
+  <br>- Ex: localhost:3000/api/Coco
+  <br> 
+  <br>http://localhost:3000/api/"category"/"year-number"/true
+  <br>- this will query movies by category that have won
+  <br>- Ex: localhost:3000/api/Writing/1999/true
+  <br> 
+  <br>Collections > To query for our collections through the URL
+  <br>
+  <br>http://localhost:3000/api/"category"/"year-number"
+  <br>- this will return an array of movie names
+  <br>- Ex: localhost:3000/api/Cinematography/2000
+  <br>
+  <br>:::Here are few categories you can search for to get started!:::
+  <br>
+  <br>Actor
+  <br>Actress
+  <br>Art Direction
+  <br>Best Motion Picture
+  <br>Cinematography
+  <br>Costume Design
+  <br>Honarary Award
+  <br>Film Editing
+  <br>Foreign Language Film
+  <br>Sound Recording
+  <br>Short Subject
+  <br>Special Effects
+  <br>Writing
+  <br>Music
+  <br>Dance Direction
+  </div>
+</body>
+</html>
