@@ -62,6 +62,15 @@ app.get('/', function(req, res) {
       //for loop that stores only the titles.
       for(var i=0; i<Data.length; i++)                        
       {
+        //Cleaning up the DataSet file.
+        if(Data[i].category == "actor in a supporting role" || Data[i].category == "actor in a leading role")
+        {
+          Data[i].category = 'actors';
+        }
+        else if(Data[i].category == "actress in a supporting role" || Data[i].category =="actress in a leading role")
+        {
+          Data[i].category = 'actresses';
+        }
           Titles[i] = (Data[i].entity); 
           Category[i] = (Data[i].category);
           Year[i]= Number(Data[i].year);
